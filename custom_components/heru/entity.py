@@ -25,6 +25,12 @@ class HeruEntity(CoordinatorEntity, Entity):
         modbus_address = str(self.idx["modbus_address"])
         self._attr_unique_id = f"{ip}_{modbus_address}"
 
+        if "description" in self.idx:
+            self._attr_extra_state_attributes = {
+                "description": self.idx["description"],
+                "modbus_address": modbus_address,
+            }
+
     @property
     def device_info(self):
         return {

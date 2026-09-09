@@ -116,6 +116,7 @@ class HeruLastSeenSensor(HeruEntity, SensorEntity):
             "device_class": SensorDeviceClass.TIMESTAMP,
             "icon": "mdi:clock",
             "modbus_address": "last_seen",
+            "description": "Timestamp of the most recent update cycle the coordinator ran for this device (not necessarily proof every read succeeded, only that a poll was attempted).",
         }
         super().__init__(coordinator, idx, config_entry)
         self._attr_native_unit_of_measurement = None
@@ -150,6 +151,7 @@ class HeruRecycleEfficiencySensor(HeruEntity, SensorEntity):
             "name": "Recycle efficiency",
             "icon": "mdi:recycle",
             "modbus_address": "recycle_efficiency",
+            "description": "Calculated heat recovery efficiency: (heat recovery temperature - outdoor temperature) / (extract temperature - outdoor temperature) * 100.",
         }
         super().__init__(coordinator, idx, config_entry)
         self.coordinator = coordinator
