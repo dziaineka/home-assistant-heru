@@ -52,7 +52,13 @@ class HeruFan(HeruEntity, FanEntity):
         self.modbus_address_get = self.idx["modbus_address_get"]
 
         self._attr_percentage = self._get_percentage()
-        self._attr_supported_features = FanEntityFeature.SET_SPEED
+        self._last_on_percentage = self._attr_percentage or 50
+        self._attr_supported_features = (
+            FanEntityFeature.SET_SPEED
+            | FanEntityFeature.TURN_ON
+            | FanEntityFeature.TURN_OFF
+        )
+        self._enable_turn_on_off_backwards_compatibility = False
 
     def _get_percentage(self):
         """Return the current speed percentage of the fan."""
@@ -77,9 +83,21 @@ class HeruFan(HeruEntity, FanEntity):
 
         # Update directly after writing, the actual value will be set on the next update from the coordinator
         self._attr_percentage = percentage
+        if percentage:
+            self._last_on_percentage = percentage
         _LOGGER.debug(
             "set %s: %d",
             self._attr_name,
             self._attr_percentage,
         )
         self.async_write_ha_state()
+
+    async def async_turn_on(self, percentage: int | None = None, preset_mode: str | None = None, **kwargs) -> None:
+        """Turn on the fan, restoring the last used speed if none is given."""
+        _LOGGER.debug("HeruFan.async_turn_on()")
+        await self.async_set_percentage(percentage if percentage is not None else self._last_on_percentage)
+
+    async def async_turn_off(self, **kwargs) -> None:
+        """Turn off the fan by setting its speed to 0%."""
+        _LOGGER.debug("HeruFan.async_turn_off()")
+        await self.async_set_percentage(0)
