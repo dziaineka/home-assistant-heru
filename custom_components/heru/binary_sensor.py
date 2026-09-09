@@ -44,6 +44,10 @@ class HeruBinarySensor(HeruEntity, BinarySensorEntity):
         self.register_type = self.idx["register_type"]
         self._attr_device_class = self.idx.get("device_class", None)
         self._attr_entity_category = self.idx["entity_category"]
+
+        if "entity_registry_enabled_default" in self.idx:
+            self._attr_entity_registry_enabled_default = self.idx["entity_registry_enabled_default"]
+
         self._attr_is_on = self._get_value()
 
     def _get_value(self):

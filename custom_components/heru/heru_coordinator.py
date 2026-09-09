@@ -55,32 +55,42 @@ class HeruCoordinator(DataUpdateCoordinator):
                     await self.client.connect()
 
                 # Read coils efficiently - group consecutive addresses
-                # 0x00001 - 0x00007 (addresses 0-6)
-                coils_result = await self.client.read_coils(0, count=7, device_id=DEFAULT_SLAVE)
-                for i, bit in enumerate(coils_result.bits):
+                # 0x00001 - 0x00006 (addresses 0-5). On the HERU 90 LP EC ARC, address 6
+                # (0x00007) is unimplemented; a read that reaches it fails as a whole
+                # Modbus exception, so keep this block at count=6.
+                coils_result = await self.client.read_coils(0, count=6, device_id=DEFAULT_SLAVE)
+                for i, bit in enumerate(coils_result.bits[:6]):
                     coil_address = f"0x{str(i + 1).zfill(5)}"
                     self._coils[coil_address] = bit
 
-                # Read discrete inputs efficiently - group consecutive addresses
-                # 1x00001 - 1x00054 (addresses 0-53)
+                # Read discrete inputs efficiently - group consecutive addresses.
+                # There is a gap at 1x00005-1x00009 (unimplemented on this unit) between
+                # the switch inputs and the alarm registers, so this must be two separate
+                # block reads - a single 0-53 read spans the gap and fails entirely.
+                # Block 1: 1x00001 - 1x00004 (addresses 0-3)
                 discrete_inputs_result = await self.client.read_discrete_inputs(
-                    0, count=54, device_id=DEFAULT_SLAVE
+                    0, count=4, device_id=DEFAULT_SLAVE
                 )
-                for i, bit in enumerate(discrete_inputs_result.bits):
+                for i, bit in enumerate(discrete_inputs_result.bits[:4]):
                     discrete_address = f"1x{str(i + 1).zfill(5)}"
                     self._discrete_inputs[discrete_address] = bit
 
+                # Block 2: 1x00010 - 1x00034 (addresses 9-33)
+                discrete_inputs_result = await self.client.read_discrete_inputs(
+                    9, count=25, device_id=DEFAULT_SLAVE
+                )
+                for i, bit in enumerate(discrete_inputs_result.bits[:25]):
+                    discrete_address = f"1x{str(9 + i + 1).zfill(5)}"
+                    self._discrete_inputs[discrete_address] = bit
+
                 # Read input registers efficiently - group consecutive addresses
-                # 3x00001 - 3x00034 (addresses 0-33) - valid range
-                result = await self.client.read_input_registers(0, count=34, device_id=DEFAULT_SLAVE)
+                # 3x00001 - 3x00033 (addresses 0-32) - valid range on the HERU 90 LP EC ARC.
+                # (Address 33 / 3x00034 onward is unimplemented on this unit; there is no
+                # 3x00041-3x00046 "quality sensor" block on this model, unlike larger HERU
+                # units, so that extra read has been removed.)
+                result = await self.client.read_input_registers(0, count=33, device_id=DEFAULT_SLAVE)
                 for i, register in enumerate(result.registers):
                     input_address = f"3x{str(i + 1).zfill(5)}"
-                    self._input_registers[input_address] = register
-
-                # 3x00041 - 3x00046 (addresses 40-45) - valid range
-                result = await self.client.read_input_registers(40, count=6, device_id=DEFAULT_SLAVE)
-                for i, register in enumerate(result.registers):
-                    input_address = f"3x{str(40 + i + 1).zfill(5)}"
                     self._input_registers[input_address] = register
 
                 # Read holding registers efficiently - group consecutive addresses

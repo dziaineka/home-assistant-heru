@@ -8,6 +8,13 @@
 
 # HERU energy recovery unit component for Home Assistant
 
+> [!NOTE]
+> This is a fork tuned for the **HERU 90 LP EC ARC**. Its Modbus gateway connects over a
+> USR-DR134 RS485-to-Ethernet converter (Modbus TCP, port 502). All register block sizes
+> and the sensor/binary_sensor lists below were verified against a live unit; registers
+> not implemented on this model (e.g. the 3x00041-3x00046 quality-sensor block and
+> 1x00038 "Night cooling active") were removed, and several previously-unmapped alarm
+> and status registers were added.
 
 Control and monitor your Östberg HERU energy recovery unit from Home Assistant through the onboard modbus interface.
 
@@ -22,12 +29,14 @@ Control and monitor your Östberg HERU energy recovery unit from Home Assistant 
 | Sensor  | Modbus register |
 | ------------- | ------------- |
 |Boost input|1x00002|
-|Changeover active|3x00034|
+|Carbon dioxide (default disabled)|3x00015|
+|Cooling|1x00032|
 |Current cooling power|3x00031|
 |Current exhaust fan control voltage|3x00033|
 |Current exhaust fan power|3x00026|
 |Current exhaust fan speed|3x00028|
 |Current exhaust fan step|3x00024|
+|Current fan speed|3x00022|
 |Current heating power|3x00029|
 |Current heat/cold recovery power|3x00030|
 |Current supply fan control voltage|3x00032|
@@ -36,19 +45,17 @@ Control and monitor your Östberg HERU energy recovery unit from Home Assistant 
 |Current supply fan step|3x00023|
 |Exhaust air temperature|3x00005|
 |Exhaust fan alarm|1x00022|
+|Exhaust pressure (default disabled)|3x00013|
 |Extract air temperature|3x00004|
 |Filter days left|3x00020|
 |Filter timer alarm|1x00025|
 |Fire alarm|1x00010|
 |Heat recovery temperature|3x00007|
 |Last seen|_Calculated_|
-|Night cooling active|1x00038|
 |Outdoor temperature | 3x00002  |
 |Overpressure input|1x00003|
-|Quality sensor 1[^1]|3x00042|
-|Quality sensor 2[^1]|3x00044|
-|Quality sensor 3[^1]|3x00046|
 |Recycle efficiency|_Calculated_|
+|Relative humidity (default disabled)|3x00014|
 |Room temperature (default disabled)|3x00008|
 |Rotor alarm|1x00011|
 |Setpoint max limit (Comfort)|4x00048|
@@ -56,9 +63,32 @@ Control and monitor your Östberg HERU energy recovery unit from Home Assistant 
 |Startup 2nd phase|1x00029|
 |Supply air temperature|3x00003|
 |Supply fan alarm|1x00021|
+|Supply pressure (default disabled)|3x00012|
 |Temperature regulation mode|4x00012|
 
-[^1]: When a physical quality sensors is installed in the HERU, the Home Assistant component must be reloaded to allow the sensors unit of measurements to be reset.
+*Pressure/humidity/CO2 sensors are disabled by default since they only report real
+values when the corresponding optional sensor accessory is physically installed;
+enable them manually if you have one.*
+
+### Binary sensors
+| Binary sensor  | Modbus register |
+| ------------- | ------------- |
+|Aux switch|1x00004|
+|CO2 boost (default disabled)|1x00033|
+|Exhaust filter alarm|1x00024|
+|Fire alarm switch|1x00001|
+|Freeze alarm|1x00013|
+|Freeze protection A level|1x00027|
+|Freeze protection B level|1x00026|
+|Heating|1x00030|
+|Low rotor temperature alarm|1x00015|
+|Low supply temperature alarm|1x00014|
+|Pulser alarm|1x00020|
+|Recovering heat/cold|1x00031|
+|RH boost (default disabled)|1x00034|
+|Supply filter alarm|1x00023|
+|Temperature sensor open circuit alarm|1x00018|
+|Temperature sensor short circuit alarm|1x00019|
 
 ### Buttons
 | Button  | Modbus register |
