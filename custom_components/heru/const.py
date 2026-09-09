@@ -750,10 +750,10 @@ HERU_SWITCHES = [
     },
     {
         "name": "Night cooling enabled",
-        "modbus_address": "4x00019",
+        "modbus_address": "4x00016",
         "icon": ICON_COOLING,
         "register_type": HOLDING_REGISTERS,
-        "description": "Enables or disables automatic night cooling (using cool outdoor air overnight to pre-cool the building).",
+        "description": "Enables or disables SNC / Smart Night Cooling (\"Sommarkyla\"): letting cool outdoor air in without recovering heat from it, when extract air is above its high limit and outdoor air is enough cooler than extract air. Verified live: toggling this on the physical remote changes 4x00016, not 4x00019 (which is an unused/RFU register in the official docs).",
     },
     {
         "name": "Cooler enabled",
