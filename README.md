@@ -86,6 +86,7 @@ enable them manually if you have one.*
 |Pulser alarm|1x00020|
 |Recovering heat/cold|1x00031|
 |RH boost (default disabled)|1x00034|
+|SNC conditions met|_Calculated_|
 |Supply filter alarm|1x00023|
 |Temperature sensor open circuit alarm|1x00018|
 |Temperature sensor short circuit alarm|1x00019|
