@@ -104,7 +104,7 @@ enable them manually if you have one.*
 | ------------- | ------------- |
 |Away mode|0x00004|
 |Boost mode|0x00003|
-|Heater enabled|4x00067|
+|Heater enabled|4x00051|
 |Night cooling enabled|4x00019|
 |Overpressure mode|0x00002|
 |Power|0x00001|

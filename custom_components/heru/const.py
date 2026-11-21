@@ -742,10 +742,10 @@ HERU_SWITCHES = [
     },
     {
         "name": "Heater enabled",
-        "modbus_address": "4x00067",
+        "modbus_address": "4x00051",
         "icon": ICON_SWITCH,
         "register_type": HOLDING_REGISTERS,
-        "description": "Enables or disables the main heater used to reach the temperature setpoint.",
+        "description": "Enables or disables the electric heater used to reach the temperature setpoint (\"Electric heater connected\", service menu Heater On/Off). 4x00067 is rejected with an illegal address error on the HERU 90 LP EC ARC.",
     },
     {
         "name": "Night cooling enabled",
